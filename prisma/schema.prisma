@@ -1,0 +1,275 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?
+  image         String?
+  role          String    @default("USER") // USER, ADMIN, ANALYST
+  bio           String?
+  expertise     String?
+  company       String?
+  phone         String?
+  isVerified    Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  karma         Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  downloads        Download[]
+  bookmarks        Bookmark[]
+  reportRequests   ReportRequest[]
+  notifications    Notification[]
+  subscriptions    Subscription[]   @relation("SubscriptionUser")
+  analystProfile   AnalystProfile?
+  forumPosts       ForumPost[]
+  forumComments    ForumComment[]   @relation("CommentAuthor")
+  followers        Follow[]         @relation("Follower")
+  following        Follow[]         @relation("Following")
+  userBadges       UserBadge[]
+  uploadReports    Report[]         @relation("AnalystReports")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  icon        String?
+  color       String?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  reports     Report[]
+  forumPosts  ForumPost[]
+}
+
+model Tag {
+  id         String    @id @default(cuid())
+  name       String    @unique
+  slug       String    @unique
+  createdAt  DateTime  @default(now())
+
+  reports    ReportTag[]
+}
+
+model Report {
+  id            String    @id @default(cuid())
+  title         String
+  slug          String    @unique
+  summary       String?
+  content       String?
+  coverImage    String?
+  pdfUrl        String?
+  analystId     String?
+  categoryId    String
+  isPremium     Boolean   @default(false)
+  isPublished   Boolean   @default(false)
+  isFeatured    Boolean   @default(false)
+  viewCount     Int       @default(0)
+  downloadCount Int       @default(0)
+  pageCount     Int       @default(0)
+  fileSize      String?
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  analyst       User?     @relation("AnalystReports", fields: [analystId], references: [id], onDelete: SetNull)
+  category      Category  @relation(fields: [categoryId], references: [id])
+  downloads     Download[]
+  bookmarks     Bookmark[]
+  reportTags    ReportTag[]
+
+  @@index([categoryId])
+  @@index([analystId])
+  @@index([isPublished])
+}
+
+model ReportTag {
+  reportId String
+  tagId    String
+  report   Report  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  tag      Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([reportId, tagId])
+}
+
+model Download {
+  id        String   @id @default(cuid())
+  userId    String?
+  reportId  String
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([reportId])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String?
+  reportId  String
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, reportId])
+  @@index([userId])
+}
+
+model ReportRequest {
+  id          String   @id @default(cuid())
+  userId      String?
+  reportType  String
+  companyName String?
+  notes       String?
+  status      String   @default("PENDING") // PENDING, APPROVED, FULFILLED, REJECTED
+  adminNotes  String?
+  reportId    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String?
+  title     String
+  message   String
+  type      String   @default("INFO") // INFO, DOWNLOAD, UPLOAD, REQUEST, SUBSCRIPTION
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Subscription {
+  id          String   @id @default(cuid())
+  userId      String?
+  analystId   String?
+  plan        String   @default("FREE") // FREE, PRO, ANALYST_PREMIUM
+  status      String   @default("ACTIVE") // ACTIVE, CANCELLED, EXPIRED
+  startDate   DateTime @default(now())
+  endDate     DateTime?
+  price       Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User?    @relation("SubscriptionUser", fields: [userId], references: [id], onDelete: SetNull)
+  analystProfile AnalystProfile? @relation("SubscriptionAnalyst", fields: [analystId], references: [id])
+
+  @@index([userId])
+  @@index([analystId])
+}
+
+model AnalystProfile {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  bio                 String?
+  expertise           String?
+  publishedCount      Int      @default(0)
+  followerCount       Int      @default(0)
+  avgRating           Float    @default(0)
+  totalRevenue        Float    @default(0)
+  monthlyRevenue      Float    @default(0)
+  isVerified          Boolean  @default(false)
+  title               String?
+  company             String?
+  linkedin            String?
+  twitter             String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptions       Subscription[]   @relation("SubscriptionAnalyst")
+}
+
+model ForumPost {
+  id          String    @id @default(cuid())
+  userId      String?
+  categoryId  String?
+  title       String
+  content     String
+  tags        String?
+  upvotes     Int       @default(0)
+  downvotes   Int       @default(0)
+  viewCount   Int       @default(0)
+  commentCount Int      @default(0)
+  isPinned    Boolean   @default(false)
+  isLocked    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  comments    ForumComment[]
+
+  @@index([userId])
+  @@index([categoryId])
+  @@index([createdAt])
+}
+
+model ForumComment {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String?
+  parentId  String?
+  content   String
+  upvotes   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull, "CommentAuthor")
+  parent    ForumComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   ForumComment[] @relation("CommentReplies")
+
+  @@index([postId])
+  @@index([userId])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badge     String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badge])
+  @@index([userId])
+}
