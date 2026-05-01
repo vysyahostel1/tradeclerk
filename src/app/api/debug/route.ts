@@ -31,6 +31,7 @@ export async function GET() {
 
     return NextResponse.json({
       status: "OK",
+      version: "v2-edge-client",
       env: envInfo,
       db: {
         status: "CONNECTED",
