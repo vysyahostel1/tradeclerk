@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaLibSQL } from '@prisma/adapter-libsql'
+import { PrismaLibSQL } from '@prisma/adapter-libsql/web'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
@@ -16,6 +16,7 @@ function createPrismaClient() {
       ? tursoUrl.replace('libsql://', 'https://')
       : tursoUrl
 
+    // Use web version of adapter (HTTP-only, works on Cloudflare Workers)
     // PrismaLibSQL is a factory — pass connection config, not a pre-created client
     const adapter = new PrismaLibSQL({
       url: httpUrl,
