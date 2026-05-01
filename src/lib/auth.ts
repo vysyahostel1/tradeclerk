@@ -1,4 +1,4 @@
-const JWT_SECRET = process.env.JWT_SECRET || 'change-me-in-production'
+const JWT_SECRET = process.env.JWT_SECRET || 'f4a719aed4908cbc33796bec07d4f852c7d88a056bb033e95af1fbf831810a41'
 
 interface TokenPayload {
   userId: string

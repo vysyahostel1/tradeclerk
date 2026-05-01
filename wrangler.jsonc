@@ -14,6 +14,7 @@
     "nodejs_compat"
   ],
   "vars": {
-    "TURSO_URL": "libsql://tradeclerk-vysyahostel1.aws-ap-south-1.turso.io"
+    "TURSO_URL": "libsql://tradeclerk-vysyahostel1.aws-ap-south-1.turso.io",
+    "JWT_SECRET": "f4a719aed4908cbc33796bec07d4f852c7d88a056bb033e95af1fbf831810a41"
   }
 }
