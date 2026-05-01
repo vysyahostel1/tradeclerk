@@ -32,6 +32,9 @@ export const metadata: Metadata = {
   icons: {
     icon: "/logo.svg",
   },
+  verification: {
+    google: "google833502ec41b301f0",
+  },
   openGraph: {
     title: "TradeClerk – Financial Research Reports Platform",
     description:
