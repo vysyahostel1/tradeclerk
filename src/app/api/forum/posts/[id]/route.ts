@@ -27,14 +27,6 @@ export async function GET(
             user: {
               select: { id: true, name: true, image: true, karma: true },
             },
-            replies: {
-              include: {
-                user: {
-                  select: { id: true, name: true, image: true, karma: true },
-                },
-              },
-              orderBy: { createdAt: "asc" },
-            },
           },
           where: { parentId: null },
           orderBy: { createdAt: "asc" },
