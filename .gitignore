@@ -68,3 +68,8 @@ worklog.md
 # IDE
 .vscode/
 .idea/
+
+# Cloudflare Workers
+.open-next/
+.dev.vars
+.wrangler/
