@@ -242,7 +242,7 @@ model ForumComment {
 
   post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
   user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull, "CommentAuthor")
-  parent    ForumComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  parent    ForumComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   replies   ForumComment[] @relation("CommentReplies")
 
   @@index([postId])
