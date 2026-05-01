@@ -108,7 +108,23 @@ export const useStore = create<AppState>((set, get) => ({
   },
 }))
 
-// Helper: call API with auth
+// Helper: call API with auth (returns Response)
+export async function fetchWithAuth(
+  path: string,
+  options: RequestInit = {}
+): Promise<Response> {
+  const token = useStore.getState().token
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string>),
+  }
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+  return fetch(path, { ...options, headers })
+}
+
+// Helper: call API with auth (returns parsed data)
 export async function apiFetch(
   path: string,
   options: RequestInit = {}

@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -39,6 +38,10 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  FileEdit,
+  Save,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -94,6 +97,31 @@ interface Category {
   reportCount: number;
 }
 
+interface PageSection {
+  id: string;
+  heading: string;
+  content: string;
+  type: string;
+}
+
+interface PageContent {
+  title: string;
+  heroSubtitle: string;
+  sections: PageSection[];
+}
+
+type PagesData = Record<string, PageContent>;
+
+const PAGE_SLUG_LABELS: Record<string, string> = {
+  about: "About Us",
+  blog: "Blog",
+  careers: "Careers",
+  contact: "Contact Us",
+  privacy: "Privacy Policy",
+  terms: "Terms of Service",
+  cookies: "Cookie Policy",
+};
+
 export function AdminDashboard() {
   const { user, isAuthenticated } = useStore();
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -111,6 +139,17 @@ export function AdminDashboard() {
   const [newPremium, setNewPremium] = useState(false);
   const [newPublished, setNewPublished] = useState(false);
   const [creating, setCreating] = useState(false);
+
+  // Pages state
+  const [pagesData, setPagesData] = useState<PagesData>({});
+  const [selectedPageSlug, setSelectedPageSlug] = useState<string | null>(null);
+  const [pageLoading, setPageLoading] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
+  const [editingHeading, setEditingHeading] = useState("");
+  const [editingContent, setEditingContent] = useState("");
+  const [newSectionHeading, setNewSectionHeading] = useState("");
+  const [newSectionContent, setNewSectionContent] = useState("");
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== "ADMIN") return;
@@ -135,6 +174,13 @@ export function AdminDashboard() {
         setAllUsers(usersData.users || []);
         setAllRequests(requestsData.requests || []);
         setCategories(catsData.categories || []);
+
+        // Fetch pages data
+        const pagesRes = await fetchWithAuth("/api/admin/pages");
+        if (pagesRes.ok) {
+          const pagesJson = await pagesRes.json();
+          setPagesData(pagesJson.pages || {});
+        }
       } catch {
         // silently fail
       } finally {
@@ -169,7 +215,6 @@ export function AdminDashboard() {
         setNewCategory("");
         setNewPremium(false);
         setNewPublished(false);
-        // Refresh reports
         const reportsRes = await fetchWithAuth("/api/reports?limit=100");
         const reportsData = await reportsRes.json();
         setAllReports(reportsData.reports || []);
@@ -222,6 +267,150 @@ export function AdminDashboard() {
     }
   };
 
+  // Pages management functions
+  const handleSelectPage = (slug: string) => {
+    setSelectedPageSlug(slug);
+    setExpandedSections(new Set());
+    setEditingSectionId(null);
+    setNewSectionHeading("");
+    setNewSectionContent("");
+  };
+
+  const handleUpdatePageMeta = async (slug: string, field: 'title' | 'heroSubtitle', value: string) => {
+    const page = pagesData[slug];
+    if (!page) return;
+    const updated = { ...page, [field]: value };
+    setPagesData(prev => ({ ...prev, [slug]: updated }));
+    try {
+      await fetchWithAuth("/api/admin/pages", {
+        method: "PUT",
+        body: JSON.stringify({ slug, page: updated }),
+      });
+      toast.success("Updated", `${field} has been saved.`);
+    } catch {
+      toast.error("Error", "Failed to update.");
+    }
+  };
+
+  const handleAddSection = async (slug: string) => {
+    if (!newSectionHeading.trim() || !newSectionContent.trim()) {
+      toast.error("Error", "Heading and content are required.");
+      return;
+    }
+    setPageLoading(true);
+    try {
+      const res = await fetchWithAuth("/api/admin/pages", {
+        method: "POST",
+        body: JSON.stringify({
+          slug,
+          action: "add-section",
+          section: {
+            id: `section-${Date.now()}`,
+            heading: newSectionHeading.trim(),
+            content: newSectionContent.trim(),
+            type: "text",
+          },
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPagesData(prev => ({ ...prev, [slug]: data.page }));
+        setNewSectionHeading("");
+        setNewSectionContent("");
+        toast.success("Added", "New section has been added.");
+      }
+    } catch {
+      toast.error("Error", "Failed to add section.");
+    } finally {
+      setPageLoading(false);
+    }
+  };
+
+  const handleUpdateSection = async (slug: string) => {
+    if (!editingSectionId || !editingHeading.trim() || !editingContent.trim()) {
+      toast.error("Error", "Heading and content are required.");
+      return;
+    }
+    setPageLoading(true);
+    try {
+      const res = await fetchWithAuth("/api/admin/pages", {
+        method: "POST",
+        body: JSON.stringify({
+          slug,
+          action: "update-section",
+          section: {
+            id: editingSectionId,
+            heading: editingHeading.trim(),
+            content: editingContent.trim(),
+          },
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPagesData(prev => ({ ...prev, [slug]: data.page }));
+        setEditingSectionId(null);
+        toast.success("Updated", "Section has been updated.");
+      }
+    } catch {
+      toast.error("Error", "Failed to update section.");
+    } finally {
+      setPageLoading(false);
+    }
+  };
+
+  const handleRemoveSection = async (slug: string, sectionId: string) => {
+    if (!confirm("Are you sure you want to remove this section?")) return;
+    setPageLoading(true);
+    try {
+      const res = await fetchWithAuth("/api/admin/pages", {
+        method: "POST",
+        body: JSON.stringify({
+          slug,
+          action: "remove-section",
+          section: { id: sectionId },
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPagesData(prev => ({ ...prev, [slug]: data.page }));
+        setExpandedSections(prev => {
+          const next = new Set(prev);
+          next.delete(sectionId);
+          return next;
+        });
+        if (editingSectionId === sectionId) {
+          setEditingSectionId(null);
+        }
+        toast.success("Removed", "Section has been removed.");
+      }
+    } catch {
+      toast.error("Error", "Failed to remove section.");
+    } finally {
+      setPageLoading(false);
+    }
+  };
+
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections(prev => {
+      const next = new Set(prev);
+      if (next.has(sectionId)) next.delete(sectionId);
+      else next.add(sectionId);
+      return next;
+    });
+  };
+
+  const startEditing = (section: PageSection) => {
+    setEditingSectionId(section.id);
+    setEditingHeading(section.heading);
+    setEditingContent(section.content);
+  };
+
+  const cancelEditing = () => {
+    setEditingSectionId(null);
+    setEditingHeading("");
+    setEditingContent("");
+  };
+
   if (!isAuthenticated || user?.role !== "ADMIN") {
     return (
       <div className="flex flex-col items-center justify-center py-20">
@@ -232,6 +421,8 @@ export function AdminDashboard() {
       </div>
     );
   }
+
+  const selectedPage = selectedPageSlug ? pagesData[selectedPageSlug] : null;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -253,6 +444,7 @@ export function AdminDashboard() {
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="requests">Requests</TabsTrigger>
             <TabsTrigger value="categories">Categories</TabsTrigger>
+            <TabsTrigger value="pages">Pages</TabsTrigger>
           </TabsList>
 
           {/* Overview */}
@@ -326,7 +518,6 @@ export function AdminDashboard() {
 
           {/* Reports tab */}
           <TabsContent value="reports">
-            {/* Create report form */}
             <Card className="mb-6">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -374,7 +565,6 @@ export function AdminDashboard() {
               </CardContent>
             </Card>
 
-            {/* Reports table */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">All Reports ({allReports.length})</CardTitle>
@@ -425,19 +615,10 @@ export function AdminDashboard() {
                             <TableCell>{r.downloadCount}</TableCell>
                             <TableCell className="text-right">
                               <div className="flex justify-end gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleTogglePublish(r.id, r.isPublished)}
-                                >
+                                <Button variant="ghost" size="sm" onClick={() => handleTogglePublish(r.id, r.isPublished)}>
                                   {r.isPublished ? <XCircle className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
                                 </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-destructive"
-                                  onClick={() => handleDeleteReport(r.id)}
-                                >
+                                <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteReport(r.id)}>
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -575,6 +756,241 @@ export function AdminDashboard() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Pages tab — CMS Editor */}
+          <TabsContent value="pages">
+            <div className="grid gap-6 lg:grid-cols-3">
+              {/* Page list sidebar */}
+              <Card className="lg:col-span-1">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FileEdit className="h-5 w-5" /> Pages
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-1">
+                    {Object.keys(PAGE_SLUG_LABELS).map((slug) => (
+                      <button
+                        key={slug}
+                        onClick={() => handleSelectPage(slug)}
+                        className={`w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${
+                          selectedPageSlug === slug
+                            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400"
+                            : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                        }`}
+                      >
+                        {PAGE_SLUG_LABELS[slug]}
+                        {pagesData[slug] && (
+                          <span className="ml-2 text-xs opacity-60">({pagesData[slug].sections.length})</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Page editor */}
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    {selectedPage ? `Edit: ${selectedPage.title}` : "Select a page to edit"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {!selectedPageSlug || !selectedPage ? (
+                    <div className="py-12 text-center text-muted-foreground">
+                      <FileText className="mx-auto mb-2 h-8 w-8" />
+                      <p className="text-sm">Select a page from the left panel to manage its content.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {/* Page title and subtitle */}
+                      <div className="space-y-4 rounded-lg border border-border p-4">
+                        <div className="space-y-2">
+                          <Label>Page Title</Label>
+                          <Input
+                            value={selectedPage.title}
+                            onChange={(e) => handleUpdatePageMeta(selectedPageSlug, "title", e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Hero Subtitle</Label>
+                          <Textarea
+                            value={selectedPage.heroSubtitle}
+                            onChange={(e) => handleUpdatePageMeta(selectedPageSlug, "heroSubtitle", e.target.value)}
+                            rows={2}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Sections list */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                            Sections ({selectedPage.sections.length})
+                          </h3>
+                        </div>
+
+                        {selectedPage.sections.length === 0 ? (
+                          <div className="rounded-lg border border-dashed border-border py-8 text-center text-muted-foreground">
+                            <p className="text-sm">No sections yet. Add one below.</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            {selectedPage.sections.map((section) => {
+                              const isExpanded = expandedSections.has(section.id);
+                              const isEditing = editingSectionId === section.id;
+
+                              return (
+                                <div
+                                  key={section.id}
+                                  className="rounded-lg border border-border transition-colors"
+                                >
+                                  {/* Section header */}
+                                  <button
+                                    onClick={() => toggleSection(section.id)}
+                                    className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-accent/50 transition-colors rounded-lg"
+                                  >
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      {isExpanded ? (
+                                        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                                      ) : (
+                                        <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                                      )}
+                                      <span className="text-sm font-medium truncate">
+                                        {section.heading}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-1 shrink-0">
+                                      <Badge variant="secondary" className="text-xs">
+                                        {section.type}
+                                      </Badge>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 w-7 p-0"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          startEditing(section);
+                                          if (!isExpanded) toggleSection(section.id);
+                                        }}
+                                      >
+                                        <FileEdit className="h-3.5 w-3.5" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 w-7 p-0 text-destructive hover:text-destructive"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleRemoveSection(selectedPageSlug, section.id);
+                                        }}
+                                        disabled={pageLoading}
+                                      >
+                                        {pageLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                                      </Button>
+                                    </div>
+                                  </button>
+
+                                  {/* Section body — view or edit */}
+                                  {isExpanded && (
+                                    <div className="border-t border-border px-4 py-3">
+                                      {isEditing ? (
+                                        <div className="space-y-3">
+                                          <div className="space-y-2">
+                                            <Label className="text-xs">Heading</Label>
+                                            <Input
+                                              value={editingHeading}
+                                              onChange={(e) => setEditingHeading(e.target.value)}
+                                              placeholder="Section heading"
+                                              className="h-8 text-sm"
+                                            />
+                                          </div>
+                                          <div className="space-y-2">
+                                            <Label className="text-xs">Content</Label>
+                                            <Textarea
+                                              value={editingContent}
+                                              onChange={(e) => setEditingContent(e.target.value)}
+                                              placeholder="Section content..."
+                                              rows={6}
+                                              className="text-sm"
+                                            />
+                                          </div>
+                                          <div className="flex gap-2 justify-end">
+                                            <Button variant="outline" size="sm" onClick={cancelEditing}>
+                                              Cancel
+                                            </Button>
+                                            <Button
+                                              size="sm"
+                                              className="bg-emerald-600 hover:bg-emerald-700"
+                                              onClick={() => handleUpdateSection(selectedPageSlug)}
+                                              disabled={pageLoading}
+                                            >
+                                              {pageLoading ? (
+                                                <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                                              ) : (
+                                                <Save className="mr-1 h-3.5 w-3.5" />
+                                              )}
+                                              Save
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+                                          {section.content}
+                                        </p>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {/* Add new section */}
+                        <div className="rounded-lg border border-dashed border-emerald-300 dark:border-emerald-700 p-4">
+                          <h4 className="mb-3 text-sm font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
+                            <Plus className="h-4 w-4" /> Add New Section
+                          </h4>
+                          <div className="space-y-3">
+                            <Input
+                              value={newSectionHeading}
+                              onChange={(e) => setNewSectionHeading(e.target.value)}
+                              placeholder="Section heading"
+                              className="h-8 text-sm"
+                            />
+                            <Textarea
+                              value={newSectionContent}
+                              onChange={(e) => setNewSectionContent(e.target.value)}
+                              placeholder="Section content..."
+                              rows={4}
+                              className="text-sm"
+                            />
+                            <div className="flex justify-end">
+                              <Button
+                                size="sm"
+                                className="bg-emerald-600 hover:bg-emerald-700"
+                                onClick={() => handleAddSection(selectedPageSlug)}
+                                disabled={pageLoading || !newSectionHeading.trim() || !newSectionContent.trim()}
+                              >
+                                {pageLoading ? (
+                                  <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Plus className="mr-1 h-4 w-4" />
+                                )}
+                                Add Section
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </motion.div>

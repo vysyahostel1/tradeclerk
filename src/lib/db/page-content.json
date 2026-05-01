@@ -1,0 +1,182 @@
+{
+  "about": {
+    "title": "About TradeClerk",
+    "heroSubtitle": "Empowering investors with institutional-grade financial research and market intelligence since 2024.",
+    "sections": [
+      {
+        "id": "about-mission",
+        "heading": "Our Mission",
+        "content": "At TradeClerk, we believe every investor deserves access to the same quality of research that institutional investors rely on. Our mission is to democratize financial intelligence by connecting retail and professional investors with verified, top-tier analysts from around the globe. We aim to bridge the information gap and level the playing field in financial markets.",
+        "type": "text"
+      },
+      {
+        "id": "about-story",
+        "heading": "Our Story",
+        "content": "TradeClerk was founded in 2024 by a team of experienced financial professionals and technology engineers who recognized a critical gap in the market. While institutional investors had access to premium research from top analysts, individual investors were left relying on fragmented, often unreliable information sources. We built TradeClerk to solve this problem by creating a centralized platform where investors of all levels can access, evaluate, and benefit from institutional-quality research reports. Today, our platform serves thousands of investors across multiple markets and asset classes.",
+        "type": "text"
+      },
+      {
+        "id": "about-values",
+        "heading": "Our Values",
+        "content": "Transparency and integrity are at the core of everything we do. We hold ourselves and our analysts to the highest ethical standards, ensuring that every report published on our platform meets our rigorous quality guidelines. We are committed to continuous innovation, regularly enhancing our platform with new tools and features that help our users make more informed investment decisions. We foster a community of learning and collaboration, where investors can share insights, discuss market trends, and grow their knowledge together.",
+        "type": "text"
+      }
+    ]
+  },
+  "blog": {
+    "title": "TradeClerk Blog",
+    "heroSubtitle": "Market insights, analysis, and educational content from our team of financial experts.",
+    "sections": [
+      {
+        "id": "blog-purpose",
+        "heading": "What We Cover",
+        "content": "Our blog features in-depth market analysis, educational articles on investing fundamentals, coverage of macroeconomic trends, sector-specific deep dives, and expert commentary on emerging opportunities. Whether you are a seasoned professional or just beginning your investment journey, our blog is designed to provide valuable insights that help you navigate the complex world of financial markets with confidence and clarity.",
+        "type": "text"
+      },
+      {
+        "id": "blog-contributors",
+        "heading": "Our Contributors",
+        "content": "Our blog articles are written by a diverse team of financial analysts, economists, and industry experts with decades of combined experience across equity markets, fixed income, commodities, and emerging asset classes. Each contributor brings a unique perspective grounded in rigorous analytical frameworks and real-world market experience, ensuring that our content is both intellectually robust and practically applicable for our readers.",
+        "type": "text"
+      }
+    ]
+  },
+  "careers": {
+    "title": "Careers at TradeClerk",
+    "heroSubtitle": "Join our team and help shape the future of financial research and market intelligence.",
+    "sections": [
+      {
+        "id": "careers-culture",
+        "heading": "Our Culture",
+        "content": "At TradeClerk, we cultivate a culture of intellectual curiosity, collaboration, and continuous learning. Our team is composed of passionate individuals who are driven by the mission to make high-quality financial research accessible to everyone. We value diverse perspectives, encourage bold ideas, and provide our team members with the resources and autonomy they need to excel in their roles and make a meaningful impact on our platform and our users.",
+        "type": "text"
+      },
+      {
+        "id": "careers-benefits",
+        "heading": "Benefits and Perks",
+        "content": "We offer competitive compensation packages, comprehensive health and wellness benefits, flexible remote work options, generous paid time off, professional development budgets, and access to our premium research platform. Our team members also enjoy regular team-building events, annual company retreats, and a supportive work environment that prioritizes work-life balance and personal growth. We believe that investing in our people is the key to building a great product.",
+        "type": "text"
+      },
+      {
+        "id": "careers-openings",
+        "heading": "Open Positions",
+        "content": "We are actively hiring for roles across engineering, data science, financial analysis, product design, and customer success. If you are passionate about fintech and want to work on challenging problems that impact millions of investors worldwide, we would love to hear from you. Please send your resume and a brief cover letter to our hiring team. We review every application carefully and respond to all qualified candidates within two business weeks.",
+        "type": "text"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Contact Us",
+    "heroSubtitle": "We would love to hear from you. Reach out to our team for any questions, feedback, or partnership inquiries.",
+    "sections": [
+      {
+        "id": "contact-general",
+        "heading": "General Inquiries",
+        "content": "For general questions about TradeClerk, our platform features, subscription plans, or partnership opportunities, please reach out to us at contact@tradeclerk.com. Our team typically responds within 24 hours during business days. We are always happy to schedule a call or demo for organizations interested in enterprise solutions or analyst partnerships.",
+        "type": "text"
+      },
+      {
+        "id": "contact-support",
+        "heading": "Support and Technical Assistance",
+        "content": "If you are experiencing technical issues, need help navigating the platform, or have questions about a specific report or feature, our support team is here to help. You can contact us at support@tradeclerk.com or use the help center within your dashboard. We also maintain an extensive knowledge base with FAQs, tutorials, and troubleshooting guides to help you get the most out of your TradeClerk experience.",
+        "type": "text"
+      },
+      {
+        "id": "contact-analyst",
+        "heading": "For Analysts",
+        "content": "Are you a financial analyst, researcher, or industry expert interested in publishing your research on TradeClerk? We are always looking for talented contributors to join our analyst network. Benefits include revenue sharing, platform visibility, and access to our growing investor community. Contact our analyst relations team at analysts@tradeclerk.com to learn more about the application process and partnership terms.",
+        "type": "text"
+      }
+    ]
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "heroSubtitle": "Last updated: January 2025. Your privacy matters to us.",
+    "sections": [
+      {
+        "id": "privacy-intro",
+        "heading": "Introduction",
+        "content": "TradeClerk is committed to protecting the privacy and security of our users' personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our platform, or interact with our services. By accessing or using TradeClerk, you agree to the practices described in this policy. We encourage you to read this policy carefully to understand our approach to data protection and your rights regarding your personal information.",
+        "type": "text"
+      },
+      {
+        "id": "privacy-collection",
+        "heading": "Information We Collect",
+        "content": "We collect information that you provide directly to us, including your name, email address, password, and any other information you choose to provide when creating an account or updating your profile. We also collect certain information automatically when you use our platform, including your IP address, browser type, device information, pages visited, and usage patterns. Additionally, we may collect information from third-party sources such as analytics providers and social media platforms when you interact with our services through those channels.",
+        "type": "text"
+      },
+      {
+        "id": "privacy-usage",
+        "heading": "How We Use Your Information",
+        "content": "We use the information we collect to provide, maintain, and improve our services, to process transactions and send related information, to personalize your experience and deliver content tailored to your interests, to communicate with you about your account, updates, and promotions, to analyze usage patterns and trends to improve our platform, to detect, prevent, and address fraud, security issues, and technical problems, and to comply with legal obligations and enforce our terms of service.",
+        "type": "text"
+      },
+      {
+        "id": "privacy-sharing",
+        "heading": "Information Sharing and Disclosure",
+        "content": "We do not sell, trade, or rent your personal information to third parties. We may share your information with service providers who assist us in operating our platform and conducting our business, with your consent or at your direction, to comply with applicable laws, regulations, or legal processes, to protect the rights, property, or safety of TradeClerk, our users, or the public, or in connection with any merger, acquisition, or sale of company assets. We implement appropriate safeguards to ensure that your information is protected when shared with third parties.",
+        "type": "text"
+      },
+      {
+        "id": "privacy-rights",
+        "heading": "Your Rights and Choices",
+        "content": "You have the right to access, update, or delete your personal information at any time through your account settings. You may opt out of receiving promotional communications from us by following the unsubscribe instructions included in those communications. You can configure your browser to refuse cookies or alert you when cookies are being sent, though some features of our platform may not function properly without cookies. If you have questions about your privacy rights or wish to make a request, please contact us at privacy@tradeclerk.com.",
+        "type": "text"
+      }
+    ]
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "heroSubtitle": "Last updated: January 2025. Please read these terms carefully before using our services.",
+    "sections": [
+      {
+        "id": "terms-acceptance",
+        "heading": "Acceptance of Terms",
+        "content": "By accessing or using the TradeClerk platform, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any part of these terms, you may not use our services. These terms apply to all visitors, users, and others who access or use TradeClerk. We reserve the right to update or modify these terms at any time without prior notice, and it is your responsibility to review these terms periodically for changes. Your continued use of the platform after any modifications constitutes your acceptance of the updated terms.",
+        "type": "text"
+      },
+      {
+        "id": "terms-use",
+        "heading": "Permitted Use",
+        "content": "You may use TradeClerk for personal, non-commercial research and investment decision-making purposes. You agree to use the platform only for lawful purposes and in accordance with these terms. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You may not use the platform to distribute, reproduce, or commercially exploit any content without explicit written permission from TradeClerk. You agree not to attempt to gain unauthorized access to any portion of the platform or its related systems.",
+        "type": "text"
+      },
+      {
+        "id": "terms-intellectual",
+        "heading": "Intellectual Property",
+        "content": "All content on TradeClerk, including but not limited to text, graphics, logos, images, research reports, data compilations, and software, is the property of TradeClerk or its content suppliers and is protected by intellectual property laws. The research reports and analyses published on our platform are the intellectual property of their respective authors and are shared with users under limited license for personal use. You may not reproduce, distribute, modify, create derivative works from, publicly display, or commercially exploit any content from our platform without prior written consent from the copyright holder.",
+        "type": "text"
+      },
+      {
+        "id": "terms-disclaimer",
+        "heading": "Disclaimer and Limitation of Liability",
+        "content": "The research reports, analyses, and other content provided on TradeClerk are for informational purposes only and do not constitute financial advice, investment recommendations, or solicitations to buy or sell any securities. Past performance is not indicative of future results. TradeClerk and its analysts are not responsible for any investment decisions made based on the information provided on our platform. We do not guarantee the accuracy, completeness, or timeliness of any content. To the maximum extent permitted by law, TradeClerk shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the platform.",
+        "type": "text"
+      }
+    ]
+  },
+  "cookies": {
+    "title": "Cookie Policy",
+    "heroSubtitle": "Last updated: January 2025. Learn about how we use cookies and similar technologies.",
+    "sections": [
+      {
+        "id": "cookies-what",
+        "heading": "What Are Cookies",
+        "content": "Cookies are small text files that are placed on your device when you visit a website. They are widely used to make websites work more efficiently, provide a better browsing experience, and supply information to the owners of the site. Cookies allow websites to recognize your device and remember information about your visit, such as your preferred language and other settings. TradeClerk uses cookies and similar tracking technologies to enhance your experience on our platform, analyze usage patterns, and deliver personalized content and advertisements.",
+        "type": "text"
+      },
+      {
+        "id": "cookies-types",
+        "heading": "Types of Cookies We Use",
+        "content": "We use essential cookies that are necessary for the basic functioning of our platform, including session management, authentication, and security features. We use analytics cookies to collect information about how visitors use our platform, including which pages are visited most often and how users navigate through the site. We use preference cookies to remember your settings and choices, such as theme preference and language settings. We may also use advertising cookies to deliver relevant advertisements and measure the effectiveness of our advertising campaigns across different channels.",
+        "type": "text"
+      },
+      {
+        "id": "cookies-manage",
+        "heading": "Managing Your Cookie Preferences",
+        "content": "You can control and manage cookies through your browser settings. Most browsers allow you to refuse cookies, delete existing cookies, or alert you when a cookie is being set. Please note that disabling certain cookies may affect the functionality of our platform and limit your ability to use some features. For more detailed information about managing cookies in your specific browser, please refer to the help documentation provided by your browser vendor. If you have questions about our use of cookies, please contact us at privacy@tradeclerk.com.",
+        "type": "text"
+      }
+    ]
+  }
+}

@@ -21,27 +21,18 @@ const footerColumns = [
   {
     title: 'Company',
     links: [
-      { label: 'About', hash: 'home' },
-      { label: 'Blog', hash: 'home' },
-      { label: 'Careers', hash: 'home' },
-      { label: 'Contact', hash: 'home' },
-    ],
-  },
-  {
-    title: 'Resources',
-    links: [
-      { label: 'Documentation', hash: 'home' },
-      { label: 'Help Center', hash: 'home' },
-      { label: 'Status', hash: 'home' },
-      { label: 'Terms', hash: 'home' },
+      { label: 'About Us', hash: 'about' },
+      { label: 'Blog', hash: 'blog' },
+      { label: 'Careers', hash: 'careers' },
+      { label: 'Contact Us', hash: 'contact' },
     ],
   },
   {
     title: 'Legal',
     links: [
-      { label: 'Privacy Policy', hash: 'home' },
-      { label: 'Terms of Service', hash: 'home' },
-      { label: 'Cookie Policy', hash: 'home' },
+      { label: 'Privacy Policy', hash: 'privacy' },
+      { label: 'Terms of Service', hash: 'terms' },
+      { label: 'Cookie Policy', hash: 'cookies' },
     ],
   },
 ]
@@ -163,12 +154,17 @@ export function Footer() {
             &copy; 2025 TradeClerk. All rights reserved.
           </p>
           <div className="flex gap-6">
-            {['Privacy Policy', 'Terms of Service', 'Contact'].map((link) => (
+            {[
+              { label: 'Privacy Policy', hash: 'privacy' },
+              { label: 'Terms of Service', hash: 'terms' },
+              { label: 'Contact', hash: 'contact' },
+            ].map((link) => (
               <button
-                key={link}
+                key={link.label}
+                onClick={() => navigate(link.hash)}
                 className="text-xs text-muted-foreground transition-colors hover:text-emerald-600 dark:hover:text-emerald-400"
               >
-                {link}
+                {link.label}
               </button>
             ))}
           </div>

@@ -23,6 +23,7 @@ import { AnalystProfile } from "@/components/analysts/analyst-profile";
 import { ForumPage } from "@/components/forum/forum-page";
 import { ForumThread } from "@/components/forum/forum-thread";
 import { SearchPage } from "@/components/shared/search-bar";
+import { DynamicPage } from "@/components/pages/dynamic-page";
 
 function parseHash(hash: string): { page: string; params: Record<string, string> } {
   const clean = hash.replace(/^#\/?/, "").replace(/\/$/, "");
@@ -127,6 +128,20 @@ export default function HomePage() {
         return <PricingSection />;
       case "search":
         return <SearchPage query={pageParams.q || ""} />;
+      case "about":
+        return <DynamicPage slug="about" />;
+      case "blog":
+        return <DynamicPage slug="blog" />;
+      case "careers":
+        return <DynamicPage slug="careers" />;
+      case "contact":
+        return <DynamicPage slug="contact" />;
+      case "privacy":
+        return <DynamicPage slug="privacy" />;
+      case "terms":
+        return <DynamicPage slug="terms" />;
+      case "cookies":
+        return <DynamicPage slug="cookies" />;
       default:
         return <LandingPage />;
     }
