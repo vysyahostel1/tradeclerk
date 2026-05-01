@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client'
-import { createClient } from '@libsql/client'
 import { PrismaLibSQL } from '@prisma/adapter-libsql'
 
 const globalForPrisma = globalThis as unknown as {
@@ -7,16 +6,21 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 function createPrismaClient() {
-  const dbUrl = process.env.DATABASE_URL || ''
+  // If TURSO_URL is set, use libsql adapter for remote database (Cloudflare Workers / Turso)
+  const tursoUrl = process.env.TURSO_URL || (typeof globalThis !== 'undefined' && (globalThis as Record<string, string>).TURSO_URL) || ''
+  const tursoToken = process.env.TURSO_AUTH_TOKEN || (typeof globalThis !== 'undefined' && (globalThis as Record<string, string>).TURSO_AUTH_TOKEN) || ''
 
-  // Use libsql adapter for Turso / D1 / any HTTP-based SQLite
-  if (dbUrl.startsWith('libsql://') || dbUrl.startsWith('http')) {
-    const libsql = createClient({
-      url: dbUrl,
-      authToken: process.env.DATABASE_AUTH_TOKEN,
+  if (tursoUrl) {
+    // Convert libsql:// to https:// for HTTP transport (required on Cloudflare Workers)
+    const httpUrl = tursoUrl.startsWith('libsql://')
+      ? tursoUrl.replace('libsql://', 'https://')
+      : tursoUrl
+
+    // PrismaLibSQL is a factory — pass connection config, not a pre-created client
+    const adapter = new PrismaLibSQL({
+      url: httpUrl,
+      authToken: tursoToken,
     })
-
-    const adapter = new PrismaLibSQL(libsql)
     return new PrismaClient({ adapter, log: ['error'] })
   }
 
