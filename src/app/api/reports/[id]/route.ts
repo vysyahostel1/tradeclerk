@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { verifyToken, getTokenFromHeader } from "@/lib/auth"
-import { Prisma } from "@prisma/client"
+import { Prisma } from "@prisma/client/edge"
 
 // GET /api/reports/[id] - Get a single report by ID
 export async function GET(

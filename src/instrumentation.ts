@@ -1,9 +1,9 @@
 /**
- * Next.js Instrumentation
- * 
- * Database initialization is now handled directly in src/lib/db.ts
- * which detects libsql:// URLs and uses the @prisma/adapter-libsql adapter.
+ * Next.js Instrumentation - runs before any server code on Cloudflare Workers
+ * Forces Prisma to use library (WASM) engine instead of native binary
  */
 export async function register() {
-  // No-op: database client is initialized lazily in db.ts
+  // Force Prisma to use library/WASM engine, not native binary
+  // This is critical for Cloudflare Workers which don't support native .node modules
+  process.env.PRISMA_CLIENT_ENGINE_TYPE = 'library'
 }

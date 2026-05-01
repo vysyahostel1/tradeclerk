@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { verifyToken, getTokenFromHeader } from "@/lib/auth"
-import { Prisma } from "@prisma/client"
+import { Prisma } from "@prisma/client/edge"
 
 // GET /api/forum/posts - List forum posts with filters and pagination
 export async function GET(request: NextRequest) {
