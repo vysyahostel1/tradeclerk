@@ -42,6 +42,9 @@ import {
   Save,
   ChevronDown,
   ChevronRight,
+  UserCog,
+  KeyRound,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -140,6 +143,14 @@ export function AdminDashboard() {
   const [newPublished, setNewPublished] = useState(false);
   const [creating, setCreating] = useState(false);
 
+  // Account settings state
+  const [accountName, setAccountName] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [accountSaving, setAccountSaving] = useState(false);
+  const [passwordSaving, setPasswordSaving] = useState(false);
+
   // Pages state
   const [pagesData, setPagesData] = useState<PagesData>({});
   const [selectedPageSlug, setSelectedPageSlug] = useState<string | null>(null);
@@ -188,7 +199,9 @@ export function AdminDashboard() {
       }
     }
     fetchData();
-  }, [isAuthenticated, user?.role]);
+    // Set current account name
+    if (user?.name) setAccountName(user.name);
+  }, [isAuthenticated, user?.role, user?.name]);
 
   const handleCreateReport = async () => {
     if (!newTitle || !newCategory) {
@@ -411,6 +424,68 @@ export function AdminDashboard() {
     setEditingContent("");
   };
 
+  // Account settings handlers
+  const handleUpdateName = async () => {
+    if (!accountName.trim() || accountName.trim().length < 2) {
+      toast.error("Error", "Name must be at least 2 characters.");
+      return;
+    }
+    setAccountSaving(true);
+    try {
+      const res = await fetchWithAuth("/api/admin/account", {
+        method: "PUT",
+        body: JSON.stringify({ name: accountName.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Name Updated", "Your display name has been changed.");
+        // Update store with new name
+        useStore.getState().setUser({ ...useStore.getState().user!, name: accountName.trim() });
+      } else {
+        toast.error("Error", data.error || "Failed to update name.");
+      }
+    } catch {
+      toast.error("Error", "Failed to update name.");
+    } finally {
+      setAccountSaving(false);
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    if (!currentPassword) {
+      toast.error("Error", "Please enter your current password.");
+      return;
+    }
+    if (!newPassword || newPassword.length < 8) {
+      toast.error("Error", "New password must be at least 8 characters.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error("Error", "New passwords do not match.");
+      return;
+    }
+    setPasswordSaving(true);
+    try {
+      const res = await fetchWithAuth("/api/admin/account", {
+        method: "PUT",
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Password Updated", "Your password has been changed successfully.");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        toast.error("Error", data.error || "Failed to update password.");
+      }
+    } catch {
+      toast.error("Error", "Failed to update password.");
+    } finally {
+      setPasswordSaving(false);
+    }
+  };
+
   if (!isAuthenticated || user?.role !== "ADMIN") {
     return (
       <div className="flex flex-col items-center justify-center py-20">
@@ -445,6 +520,7 @@ export function AdminDashboard() {
             <TabsTrigger value="requests">Requests</TabsTrigger>
             <TabsTrigger value="categories">Categories</TabsTrigger>
             <TabsTrigger value="pages">Pages</TabsTrigger>
+            <TabsTrigger value="account">Account</TabsTrigger>
           </TabsList>
 
           {/* Overview */}
@@ -988,6 +1064,169 @@ export function AdminDashboard() {
                       </div>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Account Settings tab */}
+          <TabsContent value="account">
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Change Display Name */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <UserCog className="h-5 w-5 text-emerald-600" /> Change Display Name
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Update the name displayed on your admin account.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Current Name</Label>
+                      <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/50">
+                          <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+                            {(user?.name || user?.email || "A")[0].toUpperCase()}
+                          </span>
+                        </div>
+                        <span className="text-sm font-medium">
+                          {user?.name || "Not set"}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="newName">New Name</Label>
+                      <Input
+                        id="newName"
+                        value={accountName}
+                        onChange={(e) => setAccountName(e.target.value)}
+                        placeholder="Enter new display name"
+                      />
+                    </div>
+                    <Button
+                      className="bg-emerald-600 hover:bg-emerald-700 w-full"
+                      onClick={handleUpdateName}
+                      disabled={accountSaving || !accountName.trim()}
+                    >
+                      {accountSaving ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <UserCog className="mr-2 h-4 w-4" />
+                      )}
+                      Update Name
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Change Password */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <KeyRound className="h-5 w-5 text-amber-600" /> Change Password
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Update your admin password. You must enter your current password to confirm.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="currentPwd">Current Password</Label>
+                      <Input
+                        id="currentPwd"
+                        type="password"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="Enter current password"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="newPwd">New Password</Label>
+                      <Input
+                        id="newPwd"
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="Enter new password (min. 8 characters)"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPwd">Confirm New Password</Label>
+                      <Input
+                        id="confirmPwd"
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Re-enter new password"
+                      />
+                      {confirmPassword && newPassword !== confirmPassword && (
+                        <p className="text-xs text-destructive">Passwords do not match</p>
+                      )}
+                      {newPassword && newPassword.length > 0 && newPassword.length < 8 && (
+                        <p className="text-xs text-destructive">Password must be at least 8 characters</p>
+                      )}
+                    </div>
+                    <Button
+                      className="w-full"
+                      variant="outline"
+                      style={{ borderColor: newPassword && confirmPassword && newPassword === confirmPassword && newPassword.length >= 8 ? undefined : undefined }}
+                      onClick={handleUpdatePassword}
+                      disabled={
+                        passwordSaving ||
+                        !currentPassword ||
+                        !newPassword ||
+                        !confirmPassword ||
+                        newPassword.length < 8 ||
+                        newPassword !== confirmPassword
+                      }
+                    >
+                      {passwordSaving ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <KeyRound className="mr-2 h-4 w-4" />
+                      )}
+                      Update Password
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Account Info Card */}
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <ShieldCheck className="h-5 w-5 text-blue-600" /> Account Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div className="rounded-lg border border-border p-4">
+                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
+                        Email
+                      </p>
+                      <p className="text-sm font-medium">{user?.email || "Not set"}</p>
+                    </div>
+                    <div className="rounded-lg border border-border p-4">
+                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
+                        Role
+                      </p>
+                      <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400">
+                        {user?.role || "USER"}
+                      </Badge>
+                    </div>
+                    <div className="rounded-lg border border-border p-4">
+                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
+                        Status
+                      </p>
+                      <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400">
+                        Active
+                      </Badge>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
