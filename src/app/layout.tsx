@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     icon: "/logo.svg",
   },
   verification: {
-    google: "google833502ec41b301f0",
+    google: "uEGDxnRFWEbjfNv1GHDGCFbZ8uJD5hvuxFujMWj8Ic4",
   },
   openGraph: {
     title: "TradeClerk – Financial Research Reports Platform",
